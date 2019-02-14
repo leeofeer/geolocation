@@ -1,0 +1,61 @@
+   
+<!DOCTYPE html>
+<html>
+
+    <head>
+     <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+    </head>
+
+    <!DOCTYPE html>
+    <style>
+    #map { 
+    width: 75%;
+    height: 370px;
+    box-shadow: 5px 5px 5px #888;
+    }
+    </style>
+
+    <body>
+      <div id = 'map'>
+    
+       </div>
+
+    </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+
+    <script>
+        $.ajax({
+            url: "https://ipinfo.io/json/?token=325b24074b94f9",
+            dataType:"json",
+            success: function(data){
+                procesarGeo(data);
+            }
+        });
+
+        function procesarGeo(datos){
+            alert("Tu Pais es: "+datos.country+" Tu Ciudad es: "+datos.city);
+            var localizacion = datos.loc.split(",");
+            var latitud = localizacion[0];
+            var longitud = localizacion[1];
+            console.log("latitud"+latitud+" longitud:"+longitud);
+            mostrarMapa(latitud,longitud);
+        }
+
+
+        function mostrarMapa(latitud,longitud){
+            var map = L.map('map').setView([latitud, longitud], 13);
+            L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+            maxZoom: 18}).addTo(map);
+            L.control.scale().addTo(map);
+            map.locate({setView: true, maxZoom: 16});
+            var marker = L.marker([latitud, longitud]).addTo(map);
+        }
+        
+        
+
+    </script>
+
+
+</html>

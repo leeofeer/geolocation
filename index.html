@@ -1,0 +1,140 @@
+   
+<!DOCTYPE html>
+<html>
+
+    <head>
+     <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+
+    <!DOCTYPE html>
+    <style>
+    	#map{
+    		height: 340px;
+    	}
+		#map_modal{
+    		height: 300px;
+			width: 300px;
+    	}
+    </style>
+
+    <body>
+
+		<div class="row">
+
+		  <div class="col-md-5" id="premap">
+		  <div id="map"></div></div>
+
+		  <div class="col-md-5">
+		  	<input type="text" name="negocio" id="negocio" placeholder="Introduce el nombre de tu negocio" class="form-control">
+		  	<label>Mueva la Marca en el Mapa a la posicion correcta.</label>
+
+		  	<input type="text" name="latitud" class="form-control" id="latitud" placeholder="latitud">
+		  	<input type="text" name="longitud" class="form-control" id="longitud" placeholder="longitud">
+
+		  	<button onclick="guardarU()" class="btn btn-primary">Guardar Ubicacion</button>
+			
+			
+			<table class="table table-hover" id="ubicaciones">
+				<thead>
+					<th>ID</th>
+					<th>Negocio</th>
+					<th>Latitud</th>
+					<th>Longitud</th>
+					<th>Accion</th>
+					<!--<button class="btn btn-sm btn-success">Ver</button>-->
+				</thead>
+				<tbody></tbody>
+			</table>
+		  	
+		  </div>
+
+		</div>
+    	
+<div class="modal fade" id="mapa_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Ubicacion</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="map_modal">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+	      
+    </body>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/js/bootstrap.min.js"></script>
+	
+	<script src="js/operaciones.js"></script>
+
+    <script>
+	(function() {
+		cargarTabla();
+	})();
+        navigator.geolocation.getCurrentPosition(pedirPosicion);
+
+        function pedirPosicion(pos) {
+            var latitud = pos.coords.latitude;
+            var longitud = pos.coords.longitude;
+            var precision = pos.coords.accuracy;
+
+            mostrarMapa(latitud,longitud);
+
+            console.log(latitud+" lon:"+longitud+" precision "+precision);
+ 
+         
+        }
+        
+        function mostrarMapa(latitud,longitud){
+        	//dibuja el mapa con las coordenadas capturadas por el navegador
+	
+            var map = L.map('map');
+			
+			map.setView([latitud, longitud], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+            {
+            	attribution: 'Map data &copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+            	maxZoom: 18
+            }).addTo(map);
+            L.control.scale().addTo(map);
+            map.locate({setView: true, maxZoom: 16});
+            //inserta marcador movible
+            var marker = L.marker([latitud, longitud],{draggable:true}).addTo(map);
+            
+            //capturar el evento al mover el marcador
+            marker.on("dragend", function(e){
+            	var marcador = e.target;
+            	var posicion = marcador.getLatLng();
+            	//enviar las coordenadas a la funcion para su procesamiento
+            	actualizarPosicion(posicion);
+            });
+			
+		
+            
+        }
+
+        function actualizarPosicion(posicion){
+        	var lat = document.getElementById('latitud');
+        	var lng = document.getElementById('longitud');
+        	lat.value=`${posicion.lat}`;
+        	lng.value=`${posicion.lng}`;
+        	//console.log(lat);
+        	//console.log(`${posicion.lat}`+`${posicion.lng}`);
+        }
+        
+
+    </script>
+	
+	
+</html>
